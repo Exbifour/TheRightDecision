@@ -1,0 +1,46 @@
+﻿@model IEnumerable<TheRightDecision.Models.Alternative>
+
+@{
+    ViewData["Title"] = "Alternatives";
+}
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <h3>Alternatives</h3>
+
+        <p>
+            <a class="btn btn-default" asp-action="CreateAlternative">
+                <span class="glyphicon glyphicon-plus"></span> Create New
+            </a>
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var alternative in Model)
+                {
+                    <tr>
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => alternative.Name)
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm pull-right">
+                                <a class="btn btn-default" asp-action="EditAlternative" title="Edit" asp-route-id="@alternative.AlternativeId">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+                                <a class="btn btn-danger" asp-action="RemoveAlternative" title="Remove" asp-route-id="@alternative.AlternativeId">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

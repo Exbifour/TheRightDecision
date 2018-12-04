@@ -1,0 +1,83 @@
+﻿@model IEnumerable<TheRightDecision.Models.Criterion>
+
+@{
+    ViewData["Title"] = "Criteria";
+}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h3>Criteria</h3>
+
+        <p>
+            <a class="btn btn-default" asp-action="CreateCriterion">
+                <span class="glyphicon glyphicon-plus"></span> Create New
+            </a>
+        </p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    @*<th>
+                        @Html.DisplayNameFor(model => model.Rank)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Weight)
+                    </th>*@
+                    <th>
+                        @Html.DisplayNameFor(model => model.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OptimalityType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Units)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Scale)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var criterion in Model)
+                {
+                    <tr>
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => criterion.Name)
+                        </td>
+                        @*<td>
+                            @Html.DisplayFor(modelItem => criterion.Rank)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => criterion.Weight)
+                        </td>*@
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => criterion.Type)
+                        </td>
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => criterion.OptimalityType)
+                        </td>
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => criterion.Units)
+                        </td>
+                        <td style="vertical-align:middle">
+                            @Html.DisplayFor(modelItem => criterion.Scale)
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm pull-right">
+                                <a class="btn btn-default" asp-action="EditCriterion" title="Edit" asp-route-id="@criterion.CriterionId">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+                                <a class="btn btn-danger" asp-action="RemoveCriterion" title="Remove" asp-route-id="@criterion.CriterionId">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model TheRightDecision.Models.ViewModels.ResultViewModel
+
+@{
+    ViewData["Title"] = "Coagulation Result";
+}
+
+<div class="row">
+    <div>
+        <h3>Coagulation Result</h3>
+
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <h4>Coagualtion table</h4>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Alternative
+                        </th>
+                        @foreach (Criterion criterion in Model.Criteria)
+                        {
+                            <th>
+                                @criterion.Name
+                            </th>
+                        }
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var resultElement in Model.ResultList)
+                    {
+                        <tr @if (resultElement.IsOneOfBest) { <text> style="background-color:aquamarine" </text> }>
+                            <td>
+                                @resultElement.Alternative.Name
+                            </td>
+                            @foreach (var c in Model.Criteria)
+                            {
+                                <td>
+                                    @{ var vector = resultElement.Alternative.Vectors.FirstOrDefault(v => v.Mark.CriterionId == c.CriterionId);
+                                        if (vector != null)
+                                        {
+                                            var mark = vector.Mark;
+                                            string markName = mark.Name;
+                                            string markUnits = mark.Criterion.Units ?? "";
+                                            string normalizedValue = mark.Normalized.ToString();
+                                            <text>@string.Format($"{markName} {markUnits} ({normalizedValue})")</text>
+                                        }
+                                        else
+                                        {
+                                            <text><i style="color:red">Not set</i></text>
+                                        }
+                                    }
+                                </td>
+                            }
+                            <td>
+                                @resultElement.Weight
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+

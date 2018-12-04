@@ -1,0 +1,76 @@
+﻿@model IEnumerable<TheRightDecision.Models.Criterion>
+
+@{
+    ViewData["Title"] = "Marks";
+}
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <h3>Marks</h3>
+
+        @foreach (Criterion criterion in Model)
+        {
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <a class="btn btn-default pull-right" asp-action="CreateMark" asp-route-criterionId="@criterion.CriterionId">
+                        <span class="glyphicon glyphicon-plus"></span> Add New
+                    </a>
+                    <h4>@criterion.Name</h4>
+
+                </div>
+                @if (criterion.Marks.Count == 0)
+                {
+                    <div class="panel-body">
+                        <h5><i>No marks have been added yet</i></h5>
+                    </div>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Value
+                                </th>
+                                <th>
+                                    Normalized
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Mark mark in criterion.Marks)
+                            {
+                                <tr>
+                                    <td style="vertical-align:middle">
+                                        @string.Format($"{mark.Name} {criterion.Units}")
+                                    </td>
+                                    <td style="vertical-align:middle">
+                                        @mark.Number
+                                    </td>
+                                    <td style="vertical-align:middle">
+                                        @mark.Normalized
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm pull-right">
+                                            <a class="btn btn-default" asp-action="EditMark" title="Edit" asp-route-id="@mark.MarkId">
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </a>
+                                            <a class="btn btn-danger" asp-action="RemoveMark" title="Remove" asp-route-id="@mark.MarkId">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@model TheRightDecision.Models.Alternative
+
+@{
+    ViewData["Title"] = "Edit alternative details";
+}
+
+<div class="row">
+    <div class="col-md-6 col-lg-offset-3">
+        <h3>Edit alternative details</h3>
+        <hr />
+        <div class="row">
+            <div class="col-md-8">
+                <form asp-action="CreateEditAlternative">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="AlternativeId" />
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" title="AlternativeName" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-ok"></span> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Alternatives">Back to List</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

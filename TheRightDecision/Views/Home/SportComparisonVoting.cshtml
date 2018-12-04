@@ -1,0 +1,82 @@
+﻿@model TheRightDecision.Models.ViewModels.SportComparisonVotingViewModel
+
+@{
+    ViewData["Title"] = "Sport comparison voting";
+}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h3>Sport comparison voting</h3>
+
+        <button id="beginAgainButton" class="btn btn-default">
+            <span class="glyphicon glyphicon-repeat"></span> Begin again
+        </button>
+
+        <hr />
+        <div class="progress">
+            <div id="progressBar" class="progress-bar progress-bar-danger" role="progressbar" style="min-width: 3em;"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div id="leftPanel" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 id="leftAlternativeName">Alternative name here</h4>
+                    </div>
+                    <table id="leftTable" class="table">
+                        <tbody></tbody>
+                    </table>
+                    <div class="panel-footer">
+                        <button id="voteLeftButton" class="btn btn-success" style="width:100%">
+                            <span class="glyphicon glyphicon-check"></span> Vote
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="rightPanel" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 id="rightAlternativeName">Alternative name here</h4>
+                    </div>
+                    <table id="rightTable" class="table">
+                        <tbody></tbody>
+                    </table>
+                    <div class="panel-footer">
+                        <button id="voteRightButton" class="btn btn-success" style="width:100%">
+                            <span class="glyphicon glyphicon-check"></span> Vote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/progress-bar.js"></script>
+    <script>
+        let alternatives = @Html.Raw(Json.Serialize(Model.Alternatives));
+
+        let progressBar = new ProgressBar('progressBar', alternatives.length * (alternatives.length - 1) / 2)
+
+        $('#voteRightButton').click(function () {
+            // TDDO: Impelement
+            vote();
+        });
+        $('#voteLeftButton').click(function () {
+            vote();
+            // TODO: Implement
+        });
+        $('#beginAgainButton').click(function () {
+            // TODO: Implement
+            progressBar.Reset();
+        });
+
+
+        function vote() {
+            progressBar.Move();
+        }
+
+    </script>
+}
+
+

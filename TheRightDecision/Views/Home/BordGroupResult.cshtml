@@ -1,0 +1,51 @@
+﻿@model TheRightDecision.Models.ViewModels.GroupVoteResultViewModel
+
+@{
+    ViewData["Title"] = "Bord's Rule Group Result";
+    int alternativeAmount = Model.Details[0].SelectedAlternatives.Count;
+}
+
+<div class="row">
+    <div>
+        <h3>Bord's Rule Group Result</h3>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h4>Voting Winner is <b>@Model.WinnerName</b> with <b>@Model.Points</b> points!</h4>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <h4>Voting table</h4>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        @foreach (var d in Model.Details)
+                        {
+                            <th>
+                                @d.PersonName
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < alternativeAmount; i++)
+                    {
+                        <tr>
+                            @foreach (var d in Model.Details)
+                            {
+                                <th>
+                                    @d.SelectedAlternatives[i]
+                                </th>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

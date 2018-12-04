@@ -1,0 +1,78 @@
+﻿@model TheRightDecision.Models.Mark
+
+@{
+    ViewData["Title"] = "Edit mark";
+}
+<div class="row">
+    <div class="col-md-6 col-lg-offset-3">
+        <h3>Edit mark</h3>
+        <hr />
+        <form asp-action="CreateEditMark" asp-route-criterionType="@Model.Criterion.Type">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <h4>Criterion: <b>@Model.Criterion.Name</b></h4>
+            <input type="hidden" asp-for="MarkId" />
+            <input type="hidden" asp-for="Rank" />
+            <input type="hidden" asp-for="CriterionId" />
+            <input type="hidden" asp-for="Normalized" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            @if (Model.Criterion.Type == "Qualitative")
+            {
+                <label asp-for="Number" class="control-label">How preferable this option is?</label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Number" value="5" checked> Very high
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Number" value="4"> High
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Number" value="3"> Average
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Number" value="2"> Low
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Number" value="1"> Very low
+                    </label>
+                </div>
+                @*<span asp-validation-for="Number" class="text-danger"></span>*@
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    Value will be calculated based on criterion name.
+                </div>
+                <input type="hidden" asp-for="Number" />
+            }
+            @*<div class="form-group">
+            <label asp-for="CriterionId" class="control-label">Criterion</label>
+            <select asp-for="CriterionId" asp-items="ViewBag.Criteria" class="form-control"></select>
+            <span asp-validation-for="CriterionId" class="text-danger"></span>
+        </div>*@
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-ok"></span> Save
+                </button>
+            </div>
+        </form>
+        <div>
+            <a asp-action="Marks">Back to List</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

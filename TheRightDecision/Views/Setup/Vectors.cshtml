@@ -1,0 +1,81 @@
+﻿@model IEnumerable<TheRightDecision.Models.Alternative>
+
+@{
+    ViewData["Title"] = "Vectors";
+}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <h3>Vectors</h3>
+
+        @*<p>
+                <a class="btn btn-default" asp-action="CreateVector">
+                    <span class="glyphicon glyphicon-plus"></span> Create New
+                </a>
+            </p>*@
+
+        @foreach (Alternative alternative in Model)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>@alternative.Name</h4>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Criteria
+                            </th>
+                            <th>
+                                Mark
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Criterion criterion in ViewBag.Criteria)
+                        {
+                            <tr>
+                                <td style="vertical-align:middle">
+                                    @criterion.Name
+                                </td>
+                                @{
+                                    Vector vector = alternative.Vectors.FirstOrDefault(v => v.Mark.CriterionId == criterion.CriterionId);
+                                }
+                                @if (vector == null)
+                                {
+                                    <td>
+                                        <i>Not added</i>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-warning btn-sm pull-right" asp-action="CreateVector" asp-route-alternativeId="@alternative.AlternativeId" asp-route-criterionId="@criterion.CriterionId">
+                                            <span class="glyphicon glyphicon-plus"></span> Add
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="vertical-align:middle">
+                                        @string.Format($"{vector.Mark.Name} {criterion.Units}")
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm pull-right">
+                                            <a class="btn btn-default" asp-action="EditVector" title="Edit" asp-route-id="@vector.VectorId">
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </a>
+                                            <a class="btn btn-danger" asp-action="RemoveVector" title="Remove" asp-route-id="@vector.VectorId">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+

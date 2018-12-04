@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="jumbotron col-md-8 col-lg-offset-2">
+        <h2>Good morning / day / evening / night</h2>
+        <p class="lead">Some cool info here about this web site</p>
+        <hr class="my-4">
+        <a class="btn btn-lg btn-info" asp-controller="Home" asp-action="CoagulationResult">
+            <span class="glyphicon glyphicon-sort-by-attributes-alt"></span> Coagulation
+        </a>
+        <a class="btn btn-lg btn-warning" asp-controller="Home" asp-action="SportComparison">
+            <span class="glyphicon glyphicon-th"></span> Sport comparison
+        </a>
+    </div>
+</div>

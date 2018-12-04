@@ -1,0 +1,32 @@
+﻿@model TheRightDecision.Models.Vector
+
+@{
+    ViewData["Title"] = "Edit vector";
+}
+
+<div class="row">
+    <div class="col-md-6 col-lg-offset-3">
+        <h3>Edit <b>@ViewBag.Criterion.Name</b> for <b>@Model.Alternative.Name</b></h3>
+
+        <hr />
+        <form asp-action="CreateEditVector">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="VectorId" />
+            <input type="hidden" asp-for="AlternativeId" />
+            <h4>Alternative: @Model.Alternative.Name</h4>
+            <h4>Criterion: @ViewBag.Criterion.Name</h4>
+            <div class="form-group">
+                <label class="control-label">Mark</label>
+                <select asp-for="MarkId" class="form-control" asp-items="ViewBag.Marks"></select>
+                <span asp-validation-for="MarkId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-ok"></span> Save
+                </button>
+            </div>
+        </form>
+
+        <a asp-action="Vectors">Back to List</a>
+    </div>
+</div>

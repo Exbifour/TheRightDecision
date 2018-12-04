@@ -1,0 +1,100 @@
+﻿@model TheRightDecision.Models.Criterion
+
+@{
+    ViewData["Title"] = "Edit criterion details";
+}
+
+
+<div class="row">
+    <div class="col-md-6 col-lg-offset-3">
+        <h3>Edit criterion details</h3>
+        <hr />
+        <form asp-action="CreateEditCriterion">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="CriterionId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                    <label asp-for="Rank" class="control-label"></label>
+                    <input asp-for="Rank" class="form-control" />
+                    <span asp-validation-for="Rank" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Weight" class="control-label"></label>
+                    <input asp-for="Weight" class="form-control" />
+                    <span asp-validation-for="Weight" class="text-danger"></span>
+                </div>*@
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                @*<input asp-for="Type" class="form-control" />*@
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Type" value="Quantitative" checked> Quantitative
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Type" value="Qualitative"> Qualitative
+                    </label>
+                </div>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OptimalityType" class="control-label"></label>
+                @*<input asp-for="OptimalityType" class="form-control" />*@
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="OptimalityType" value="Max" checked> Max
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="OptimalityType" value="Min"> Min
+                    </label>
+                </div>
+                <span asp-validation-for="OptimalityType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Units" class="control-label"></label>
+                <input asp-for="Units" class="form-control" />
+                <span asp-validation-for="Units" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Scale" class="control-label"></label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Scale" value="Absolute" checked> Absolute scale
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Scale" value="Relationship"> Relationship scale
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="Scale" value="Name"> Scale of names
+                    </label>
+                </div>
+                <span asp-validation-for="Scale" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-ok"></span> Save
+                </button>
+            </div>
+        </form>
+        <div>
+            <a asp-action="Criteria">Back to List</a>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using TheRightDecision.Data;
 using TheRightDecision.Models;
@@ -89,9 +91,11 @@ namespace TheRightDecision.Controllers
 
         private void SaveCoagulationResult(List<ResultElement> resultElements)
         {
-            RemoveResultsByPerson();
+            RemoveResultsByPerson(null);
 
             List<Result> results = new List<Result>();
+            
+            // Move to separate method.
             int previousRank = 1;
             double previousValue = resultElements[0].Weight;
             foreach (ResultElement el in resultElements)
@@ -115,10 +119,9 @@ namespace TheRightDecision.Controllers
             _context.SaveChanges();
         }
 
-        private void RemoveResultsByPerson()
+        private void RemoveResultsByPerson(int? id)
         {
-            // TODO: Implement for not-null users.
-            List<Result> results = _context.Results.Where(r => !r.PersonId.HasValue).ToList();
+            List<Result> results = _context.Results.Where(r => r.PersonId == id).ToList();
             _context.RemoveRange(results);
             _context.SaveChanges();
         }
@@ -131,15 +134,22 @@ namespace TheRightDecision.Controllers
             return RedirectToAction("SportComparisonVoting");
         }
 
-        public IActionResult SportComparisonVoting()
+        public IActionResult SelectPerson(string redirectUrl)
         {
-            var model = new SportComparisonVotingViewModel();
+            ViewBag.ReridectUrl = redirectUrl;
+            return View();
+        }
+
+        // TODO: Add a way for user to input their name. Then select Person by Name from "People" table or add a new Person.
+        public IActionResult SportComparisonVoting(string personName = null)
+        {
             IEnumerable<Alternative> alternatives = _context.Alternatives
                 .Include(a => a.Vectors)
                     .ThenInclude(v => v.Mark)
                         .ThenInclude(m => m.Criterion);
 
-            model.Alternatives = alternatives.Select(a => new SportComparisonVotingElement()
+            // TODO: Implemet Pareto-optimal selection
+            var model = alternatives.Select(a => new SportComparisonVotingViewModel()
             {
                 AlternativeId = a.AlternativeId,
                 AlternativeName = a.Name,
@@ -156,8 +166,44 @@ namespace TheRightDecision.Controllers
                                 return v.Mark.Name + " " + v.Mark.Criterion.Units;
                             })
             });
+            
 
             return View(model);
+        }
+
+        [HttpPost]
+        public JsonResult SportComparisonSaveVotes([FromBody]List<Result> votingResults)
+        {
+            RemoveResultsByPerson(null);
+
+            // TODO: Move to separate method.
+            int rank = 1;
+            var orderedData = votingResults.OrderByDescending(r => r.AlternativeWeight);
+            double previousPoints = orderedData.First().AlternativeWeight;
+            foreach (var res in orderedData)
+            {
+                if (res.AlternativeWeight < previousPoints)
+                {
+                    rank++;
+                    previousPoints = res.AlternativeWeight;
+                }
+                Result resultToUpload = new Result()
+                {
+                    PersonId = null,
+                    AlternativeId = res.AlternativeId,
+                    AlternativeWeight = res.AlternativeWeight,
+                    Rank = rank
+                };
+                _context.Results.Add(resultToUpload);
+            }
+            _context.SaveChanges();
+
+            return Json(new { url = Url.Action("Index", "Home")});
+        }
+
+        public IActionResult SportComparisonResult(List<SportComparisonResultViewModel> result)
+        {
+            return View(result);
         }
 
         #endregion

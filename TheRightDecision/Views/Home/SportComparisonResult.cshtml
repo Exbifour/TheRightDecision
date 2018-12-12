@@ -1,0 +1,33 @@
+﻿@model IEnumerable<TheRightDecision.Models.ViewModels.SportComparisonResultViewModel>
+
+@{
+    ViewData["Title"] = "Sport Comparison Result";
+    var winners = Model.Where(a => a.IsOneOfWinners);
+    bool thereAreMultipleWinners = false;
+    if (winners.Count() > 1)
+    {
+        thereAreMultipleWinners = true;
+    }
+    string winnerNames = Model.Where(a => a.IsOneOfWinners)
+        .Aggregate("",
+        (res, a) => a.AlternativeName + ", ",
+        res => res.Substring(0, res.Length - 2)
+        );
+    string winnerPanelHeadindText = string.Format("The winner{0} {1}", thereAreMultipleWinners ? "s are" : "is", winnerNames);
+}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h3>Sport comparisonresults</h3>
+        <hr />
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3>
+                    @winnerPanelHeadindText
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+

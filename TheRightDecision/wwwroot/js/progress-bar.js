@@ -6,8 +6,6 @@
         this.currentStep = 0;
         this.id = '#' + id;
         this.updateText();
-
-        console.log(this.numberOfSteps + ' | ' + this.stepWidth);
     }
 
     Move() {
@@ -26,10 +24,10 @@
 
     Reset() {
         this.currentStep = 0;
-        $(this.id).css('width', 0);
-        $(this.id).text(this.currentStep);
-        $(this.id).removeClass('progress-bar-warning, progress-bar-success');
+        $(this.id).removeClass('progress-bar-warning progress-bar-success');
         $(this.id).addClass('progress-bar-danger');
+        $(this.id).css('width', '3em');
+        this.updateText();
     }
 
     updateText() {

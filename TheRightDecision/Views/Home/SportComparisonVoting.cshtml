@@ -1,4 +1,4 @@
-﻿@model TheRightDecision.Models.ViewModels.SportComparisonVotingViewModel
+﻿@model IEnumerable<TheRightDecision.Models.ViewModels.SportComparisonVotingViewModel>
 
 @{
     ViewData["Title"] = "Sport comparison voting";
@@ -11,14 +11,17 @@
         <button id="beginAgainButton" class="btn btn-default">
             <span class="glyphicon glyphicon-repeat"></span> Begin again
         </button>
+        <button id="saveResultsButton" class="btn btn-primary pull-right" disabled>
+            <span class="glyphicon glyphicon-ok"></span> Save results
+        </button>
 
         <hr />
         <div class="progress">
             <div id="progressBar" class="progress-bar progress-bar-danger" role="progressbar" style="min-width: 3em;"></div>
         </div>
-        <div class="row">
+        <div id="container" class="row">
             <div class="col-md-6">
-                <div id="leftPanel" class="panel panel-default">
+                <div id="leftPanel" class="panel panel-default" hidden>
                     <div class="panel-heading">
                         <h4 id="leftAlternativeName">Alternative name here</h4>
                     </div>
@@ -33,7 +36,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div id="rightPanel" class="panel panel-default">
+                <div id="rightPanel" class="panel panel-default" hidden>
                     <div class="panel-heading">
                         <h4 id="rightAlternativeName">Alternative name here</h4>
                     </div>
@@ -54,26 +57,198 @@
 @section Scripts {
     <script src="~/js/progress-bar.js"></script>
     <script>
-        let alternatives = @Html.Raw(Json.Serialize(Model.Alternatives));
+        $('#saveResultsButton').hide();
 
-        let progressBar = new ProgressBar('progressBar', alternatives.length * (alternatives.length - 1) / 2)
+        const alternatives = @Html.Raw(Json.Serialize(Model));
+        console.log(alternatives);
+        const progressBar = new ProgressBar('progressBar', alternatives.length * (alternatives.length - 1) / 2)
 
-        $('#voteRightButton').click(function () {
-            // TDDO: Impelement
-            vote();
-        });
+        let currentLeftIndex = 0;
+        let currentRightIndex = 1;
+
+        const results = [];
+        alternatives.forEach(
+            a => results.push(
+                {
+                    alternativeId: a.alternativeId,
+                    alternativeName: a.alternativeName,
+                    wonNextAlternatives: [],
+                    points: 0,
+                    isOneOfWinners: false
+                })
+        );
+
+        populateLeftPanel();
+
         $('#voteLeftButton').click(function () {
-            vote();
-            // TODO: Implement
+            $(this).attr("disabled", true);
+            $('#voteRightButton').attr("disabled", true);
+            vote(currentLeftIndex, currentRightIndex);
         });
+        $('#voteRightButton').click(function () {
+            $(this).attr("disabled", true);
+            $('#voteLeftButton').attr("disabled", true);
+            vote(currentRightIndex, currentLeftIndex);
+        });
+
         $('#beginAgainButton').click(function () {
-            // TODO: Implement
             progressBar.Reset();
+
+            currentLeftIndex = 0;
+            currentRightIndex = 1;
+            results.forEach(res => {
+                res.wonNextAlternatives = [];
+                res.points = 0;
+                res.isOneOfWinners = false;
+            });
+            $('#saveResultsButton').attr('disabled', true);
+            $('#saveResultsButton').fadeOut('fast');
+            $('#resultsPanel').fadeOut('fast', function () {
+                $('#resultsPanel').remove();
+                populateLeftPanel();
+            });
         });
 
+        $('#saveResultsButton').click(function () {
+            $('#beginAgainButton').attr("disabled", true);
+            $('#saveResultsButton').attr("disabled", true);
+            const data = [];
+            results.forEach(r => data.push(
+                {
+                    alternativeId: r.alternativeId,
+                    alternativeWeight: r.points
+                })
+            );
+            console.log(results);
+            console.log(data);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("SportComparisonSaveVotes", "Home", new { id = ViewBag.UserId })',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify([...data]),
+                success: function (response) {
+                    window.location = response.url;
+                },
+                error: function () {
+                    alert('ERROR: Something gone horribly wrong!');
+                }
+            });
+        });
 
-        function vote() {
+        function vote(winnerIndex, loserIndex) {
             progressBar.Move();
+
+            const winnerId = alternatives[winnerIndex].alternativeId;
+            const loserId = alternatives[loserIndex].alternativeId;
+            let winner = results.find(r => r.alternativeId == winnerId);
+            winner.wonNextAlternatives.push(loserId);
+            winner.points++;
+
+            currentRightIndex++;
+            populateRightPanel();
+        }
+
+        function populateLeftPanel() {
+            if (currentLeftIndex == alternatives.length - 1) {
+                completeVoting();
+                return;
+            }
+            populateRightPanel();
+            $('#leftPanel').fadeOut('slow', function () {
+                const alt = alternatives[currentLeftIndex];
+                $('#leftAlternativeName').text(alt.alternativeName);
+                populateTable('#leftTable', alt.marks);
+                $('#leftPanel').fadeIn('slow', function () {
+                    $('#voteRightButton').attr("disabled", false);
+                    $('#voteLeftButton').attr("disabled", false);
+                });
+            });
+        }
+
+        function populateRightPanel() {
+            if (currentRightIndex == alternatives.length) {
+                currentLeftIndex++;
+                currentRightIndex = currentLeftIndex + 1;
+                populateLeftPanel();
+                return;
+            }
+            $('#rightPanel').fadeOut('slow', function () {
+                const alt = alternatives[currentRightIndex];
+                $('#rightAlternativeName').text(alt.alternativeName);
+                populateTable('#rightTable', alt.marks);
+                $('#rightPanel').fadeIn('slow', function () {
+                    $('#voteRightButton').attr("disabled", false);
+                    $('#voteLeftButton').attr("disabled", false);
+                });
+
+            });
+        }
+
+        function populateTable(tableId, marks) {
+            $(tableId + ' > tbody').empty();
+            for (let m in marks) {
+                let markup = '<tr><th>' + m + '</th><td>' + marks[m] + '</td></tr>';
+                $(tableId + ' > tbody').append(markup);
+            }
+        }
+
+        function completeVoting() {
+            $('#leftPanel').fadeOut('slow');
+            $('#rightPanel').fadeOut('slow', function () {
+                calculateResults();
+                showResults();
+                $('#saveResultsButton').removeAttr('disabled');
+                $('#saveResultsButton').fadeIn('slow');
+            });
+        }
+
+        function calculateResults() {
+            let maxPoints = Math.max.apply(Math, results.map(r => r.points));
+            results.filter(r => r.points == maxPoints).forEach(r => r.isOneOfWinners = true);
+        }
+
+        function showResults() {
+            let tableHeaderMarkup = '<thead><tr><th></th>';
+            results.forEach(r => tableHeaderMarkup += '<th>' + r.alternativeName + '</th>');
+            tableHeaderMarkup += '<th>Points</th></tr></thead>';
+
+            let tableBodyMarkup = '<tbody></tbody>';
+
+            $('#container').append('<div id="resultsPanel" class="panel panel-default" hidden><div class="panel-heading"><h4>Here are your votes</h4></div></div>')
+
+            $('#resultsPanel').append('<table class="table"></table>');
+            $('#resultsPanel > table').css("text-align", "center");
+
+            $('#resultsPanel > table').append(tableHeaderMarkup + tableBodyMarkup);
+
+            results.forEach(r => {
+                let rowHeading = r.isOneOfWinners ? '<tr class="info"><th><span class="glyphicon glyphicon-star"></span> ' : '<tr><th>';
+                rowHeading += r.alternativeName + '</th>';
+
+                let rowMarks = '';
+                let votesIndex = 0;
+                results.forEach(res => {
+                    if (res.alternativeId == r.alternativeId) {
+                        rowMarks += '<td> - </td>';
+                        votesIndex++;
+                    }
+                    else if (res.alternativeId == r.wonNextAlternatives[votesIndex]) {
+                        rowMarks += '<td> > </td>';
+                        votesIndex++;
+                    }
+                    else {
+                        rowMarks += '<td> < </td>';
+                    }
+                });
+
+                let rowPoints = '<td>' + r.points + '</td>';
+                let rowMarkup = rowHeading + rowMarks + rowPoints + '</tr>';
+
+                $('#resultsPanel > table > tbody').append(rowMarkup);
+            });
+
+            $('#resultsPanel').fadeIn('slow');
         }
 
     </script>

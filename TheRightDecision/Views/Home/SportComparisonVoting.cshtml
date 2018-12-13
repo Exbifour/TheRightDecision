@@ -19,6 +19,12 @@
         <div class="progress">
             <div id="progressBar" class="progress-bar progress-bar-danger" role="progressbar" style="min-width: 3em;"></div>
         </div>
+        @if (ViewBag.SomeAlternativesWereRemoved)
+        {
+            <div class="alert alert-danger alert-dismissable" role="alert">
+                Some alternatives have been excluded because they are worse than some other alternative.
+            </div>
+        }
         <div id="container" class="row">
             <div class="col-md-6">
                 <div id="leftPanel" class="panel panel-default" hidden>

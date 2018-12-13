@@ -94,7 +94,7 @@ namespace TheRightDecision.Controllers
             RemoveResultsByPerson(null);
 
             List<Result> results = new List<Result>();
-            
+
             // Move to separate method.
             int previousRank = 1;
             double previousValue = resultElements[0].Weight;
@@ -143,12 +143,13 @@ namespace TheRightDecision.Controllers
         // TODO: Add a way for user to input their name. Then select Person by Name from "People" table or add a new Person.
         public IActionResult SportComparisonVoting(string personName = null)
         {
+            var optimalAlternativesIds = GetOptimalAlternatives();
             IEnumerable<Alternative> alternatives = _context.Alternatives
+                .Where(a => optimalAlternativesIds.Contains(a.AlternativeId))
                 .Include(a => a.Vectors)
                     .ThenInclude(v => v.Mark)
                         .ThenInclude(m => m.Criterion);
 
-            // TODO: Implemet Pareto-optimal selection
             var model = alternatives.Select(a => new SportComparisonVotingViewModel()
             {
                 AlternativeId = a.AlternativeId,
@@ -166,9 +167,65 @@ namespace TheRightDecision.Controllers
                                 return v.Mark.Name + " " + v.Mark.Criterion.Units;
                             })
             });
-            
+
+            ViewBag.SomeAlternativesWereRemoved = false;
+            if (model.Count() < _context.Alternatives.Count())
+            {
+                ViewBag.SomeAlternativesWereRemoved = true;
+            }
 
             return View(model);
+        }
+
+        private List<int> GetOptimalAlternatives()
+        {
+            var alternatives = _context.Alternatives.Select(a => a.AlternativeId).ToList();
+            List<int> optimalAlternatives = new List<int>();
+
+            foreach (int a in alternatives)
+            {
+
+                if (AlternativeIsNotWorseThanAnyOther(a))
+                {
+                    optimalAlternatives.Add(a);
+                }
+            }
+
+            return optimalAlternatives;
+        }
+
+        private bool AlternativeIsNotWorseThanAnyOther(int id)
+        {
+            var alternatives = _context.Alternatives.Include(a => a.Vectors).ThenInclude(v => v.Mark).ToList();
+
+            var allAlternatives = alternatives.Select(
+                a => new
+                {
+                    Id = a.AlternativeId,
+                    Marks = a.Vectors.ToDictionary(v => v.Mark.CriterionId, v => v.Mark.Normalized)
+                })
+            .ToList();
+
+            var alternativeToTest = allAlternatives.First(a => a.Id == id);
+            allAlternatives.Remove(alternativeToTest);
+
+            foreach (var mark in alternativeToTest.Marks)
+            {
+                for (int i = 0; i < allAlternatives.Count; i++)
+                {
+                    var compareTo = allAlternatives[i];
+                    if (compareTo.Marks[mark.Key] < mark.Value)
+                    {
+                        allAlternatives.Remove(compareTo);
+                        i--;
+                    }
+                }
+                if (allAlternatives.Count == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         [HttpPost]
@@ -198,7 +255,7 @@ namespace TheRightDecision.Controllers
             }
             _context.SaveChanges();
 
-            return Json(new { url = Url.Action("Index", "Home")});
+            return Json(new { url = Url.Action("Index", "Home") });
         }
 
         public IActionResult SportComparisonResult(List<SportComparisonResultViewModel> result)

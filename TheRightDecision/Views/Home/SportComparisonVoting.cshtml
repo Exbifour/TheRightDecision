@@ -21,9 +21,12 @@
         </div>
         @if (ViewBag.SomeAlternativesWereRemoved)
         {
-            <div class="alert alert-danger alert-dismissable" role="alert">
-                Some alternatives have been excluded because they are worse than some other alternative.
-            </div>
+        <div class="alert alert-danger alert-dismissable" role="alert">
+            Some alternatives have been excluded because they are worse than some other alternative.
+            <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         }
         <div id="container" class="row">
             <div class="col-md-6">

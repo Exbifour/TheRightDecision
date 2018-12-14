@@ -134,12 +134,6 @@ namespace TheRightDecision.Controllers
             return RedirectToAction("SportComparisonVoting");
         }
 
-        public IActionResult SelectPerson(string redirectUrl)
-        {
-            ViewBag.ReridectUrl = redirectUrl;
-            return View();
-        }
-
         // TODO: Add a way for user to input their name. Then select Person by Name from "People" table or add a new Person.
         public IActionResult SportComparisonVoting(string personName = null)
         {
@@ -149,7 +143,6 @@ namespace TheRightDecision.Controllers
                 .Include(a => a.Vectors)
                     .ThenInclude(v => v.Mark)
                         .ThenInclude(m => m.Criterion);
-
             var model = alternatives.Select(a => new SportComparisonVotingViewModel()
             {
                 AlternativeId = a.AlternativeId,
@@ -256,11 +249,6 @@ namespace TheRightDecision.Controllers
             _context.SaveChanges();
 
             return Json(new { url = Url.Action("Index", "Home") });
-        }
-
-        public IActionResult SportComparisonResult(List<SportComparisonResultViewModel> result)
-        {
-            return View(result);
         }
 
         #endregion
